@@ -1,176 +1,66 @@
-# 環境構築の手順
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-## 前提
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-### Windows
+## About Laravel
 
-- Docker Desktop for Windowsが利用可能になっている
-- WSL2 + Ubuntuのセットアップが完了している
-  - 参考）[WSL2 + Ubuntuのセットアップ](./document/WSL2.md)
-- hostsファイルに ```127.0.0.1 localhost```のような記載があり、localhostでアクセスが可能になっている
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-### Mac
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-- Docker Desktop for Mac が利用可能になっている
-- hostsファイルに ```127.0.0.1 localhost```のような記載があり、localhostでアクセスが可能になっている
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## 注意事項
-- 以降の構築手順はエディター内のターミナルタブ、Windowsターミナルなどどこから実施してもOKです
-- dockerディレクトリ以下に```CRLF```ファイルがあるとビルドに失敗します
-- CTRL+選択した状態でCTRL+SHIFT+Aでアクションを実施→```LF - Unix and MacOS```を実施すると一括でLFに変更できます
-- インストール時の権限でファイル所有者がrootなどになっていると正常に動作しない場合があるので、その場合はchownで対応してください
-    - 例）`sudo chown {name}:{group} -R {target_dir}`
+## Learning Laravel
 
-## 環境構築
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-### リポジトリをcloneする
+You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
-1. 任意の場所にディレクトリを作成する
-  - 例 `/home/user-name/workspace/wportal2`
-2. 上記のディレクトリをエディターで開く
-3. 本リポジトリをcloneする
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-### .envファイルを用意する
+## Laravel Sponsors
 
-1. 以下のコマンドを実行する
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-```
-cd wportal2-app
-cp .env.local.sample .env
-```
+### Premium Partners
 
-2. Backlogのwiki[[接続情報]]に記載の以下の環境変数を設定する
+- **[Vehikl](https://vehikl.com/)**
+- **[Tighten Co.](https://tighten.co)**
+- **[WebReinvent](https://webreinvent.com/)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
+- **[Cyber-Duck](https://cyber-duck.co.uk)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Jump24](https://jump24.co.uk)**
+- **[Redberry](https://redberry.international/laravel/)**
+- **[Active Logic](https://activelogic.com)**
+- **[byte5](https://byte5.de)**
+- **[OP.GG](https://op.gg)**
 
-```
-GOOGLE_CLIENT_ID=<YOUR_GOOGLE_CLIENT_ID>
-GOOGLE_CLIENT_SECRET=<YOUR_GOOGLE_CLIENT_SECRET>
-```
+## Contributing
 
-### コンテナを起動する
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-```
-cd ..
-docker-compose build
-docker-compose up -d
-```
+## Code of Conduct
 
-### composerとnpmをインストールする
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-```
-docker exec -it wportal2_web bash
-> composer install
-> npm ci
-```
+## Security Vulnerabilities
 
-### データベースを初期化する
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-```
-## 初めて初期化する場合
-> php artisan migrate
+## License
 
-## 再度初期化する場合
-> php artisan migrate:refresh
-```
-
-### ログファイルの権限を修正する
-
-- コンテナから抜け出してUbuntu上などのターミナルで実行する
-- /wportal2-appの直下で実行する
-
-```
-sudo chmod -R 777 storage/
-```
-
-### minioの設定
-
-1. http://localhost:19001/login へアクセスする
-2. `.env`に記載の以下の情報でログインする
-
-```
-WPORTAL_STORAGE_ACCESS_KEY=
-WPORTAL_STORAGE_SECRET_KEY=
-```
-
-3. http://localhost:19001/buckets へアクセスする
-4. `Create Bucket +`のボタンをクリックする
-5. `Bucket Name`に`.env`に記載の以下の情報を入力する
-
-```
-WPORTAL_STORAGE_BUCKET=
-```
-
-6. `Create Bucket`のボタンをクリックする
-
-### 初期データを投入する
-
-```
-docker exec -it wportal2_web bash
-> php artisan db:seed --class=TestCaseSeeder
-```
-
-### 環境構築後の動作確認
-
-1. 以下のコマンドを実行する
-
-```
-docker exec -it wportal2_web bash
-> npm run dev
-```
-
-2. [http://localhost:9190](http://localhost:9190)へアクセスする
-3. Googleアカウントで認証する
-4. [http://localhost:9190/attendance](http://localhost:9190/attendance)へアクセスする
-5. 以下のような画面が表示されることを確認する<br/>※「他メンバーの状況」に表示される情報が異なっても問題ありません
-
-<div align="center"><img src="document/images/attendance.png" width="800" alt="attendance.png"></div>
-
-## precommitの設定
-
-### precommitを設定する
-
-- コンテナから抜け出してUbuntu上などのターミナルで実行する
-- /wportal2-appの直下で実行する
-
-```
-(> exit)
-npm run prepare
-```
-
-### コミット時の動作確認
-
-1. 任意のブランチを作成する
-2. `wportal2-app/resources/script/Pages/MvcValue/MvcValue.tsx`に動作確認のコードを追加する
-
-```
-const i = 0;
-```
-
-3. 下記のコマンドを実施する
-
-```
-git add .
-docker exec -it wportal2_web bash
-> npm run lefthook
-```
-
-4. 以下のようなエラー表示がされてコミットができないことを確認する
-
-```
-/var/www/html/wportal2-app/resources/script/Pages/MvcValue/MvcValue.tsx
-  10:9  error  'i' is assigned a value but never used  @typescript-eslint/no-unused-vars
-
-✖ 1 problem (1 error, 0 warnings)
-```
-
-## 付録
-
-- [利用パッケージについて](document/PACKAGE.md)
-- [Laravel/Inertiaの基本的な導線とページ作成ガイド](./document/PAGE_CREATION_GUIDE.md)
-- [推奨するEnumの利用・自動出力について](./document/ENUM_EXPORT.md)
-- [レスポンシブ対応（mediaQuery)について](document/MEDIA_QUERY.md)
-- [GraphQLの利用方法について](./document/GRAPHQL.md)
-- [バリデーション（フロント/サーバー）について](./document/VALIDATION.md)
-- [SPAビルドについて](./document/SPA.md)
-- [InertiaLinkとPartialLoadについて](./document/INERTIA_LINK_AND_PARTIAL_LOAD.md)
-- [TIPS](./document/TIPS.md)
-- [テスト実行ガイド（VS Code: チャット/フラスコ対応）](./document/TESTING.md)
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
