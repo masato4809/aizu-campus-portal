@@ -1,0 +1,135 @@
+name: wportal2-command2
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: 'Command2(stable)'
+        required: true
+        default: 'php artisan route:list'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: "ap-northeast-1"
+  AWS_ECS_CLUSTER: arn:aws:ecs:ap-northeast-1:979109089196:cluster/wportal2-ecs-cluster
+  AWS_ECS_SERVICE: arn:aws:ecs:ap-northeast-1:979109089196:service/wportal2-ecs-cluster/wportal2-ecs-service
+  AWS_ECS_TASK: "wportal2-task"
+  CONTAINER_NAME: "wportal2-container"
+  # CloudWatch ログのロググループ名
+  TASK_LOG_GROUP: /wportal2/ecs
+  # CloudWatch ログストリーム名のプレフィックス
+  TASK_LOG_PREFIX: httpd
+
+jobs:
+  command:
+    runs-on: ubuntu-latest
+    steps:
+      # AWS認証設定.
+      - name: configure aws credential
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::979109089196:role/wportal2_deploy_iam_role
+          aws-region: ap-northeast-1
+
+      # 最新タスク定義の取得.
+      - name: Get latest task definition revision
+        id: get-latest-task-def
+        env:
+          TASK_FAMILY: ${{ env.AWS_ECS_TASK }}
+        run: |
+          LATEST_TASK_DEF=$(aws ecs list-task-definitions --family-prefix ${{ env.TASK_FAMILY }} --sort DESC --max-items 1 --query "taskDefinitionArns[0]")
+          echo "DEF: $LATEST_TASK_DEF"
+          echo "latest_task_def=$LATEST_TASK_DEF" >> $GITHUB_OUTPUT
+
+      # ネットワーク設定の取得.
+      - name: Get ECS service network configuration
+        id: get-network-config
+        env:
+          CLUSTER_NAME: ${{ env.AWS_ECS_CLUSTER }}
+          SERVICE_NAME: ${{ env.AWS_ECS_TASK }}
+        run: |
+          NETWORK_CONFIG=$(aws ecs describe-services --cluster ${{ env.CLUSTER_NAME }} --services ${{ env.SERVICE_NAME }} --query "services[0].networkConfiguration.awsvpcConfiguration" --output json)
+          SUBNET=$(echo $NETWORK_CONFIG | jq -r '.subnets[0]')
+          SECURITY_GROUP=$(echo $NETWORK_CONFIG | jq -r '.securityGroups[0]')
+          echo "subnet=${SUBNET}" >> $GITHUB_OUTPUT
+          echo "security_group=${SECURITY_GROUP}" >> $GITHUB_OUTPUT
+
+      # ECSタスクの実行.
+      - name: Run ECS Task
+        id: run-ecs-task
+        env:
+          LATEST_TASK_DEF: ${{ steps.get-latest-task-def.outputs.latest_task_def }}
+          ECS_TASK_SUBNET: ${{ steps.get-network-config.outputs.subnet }}
+          ECS_TASK_SECURITY_GROUP: ${{ steps.get-network-config.outputs.security_group }}
+        run: |
+          TASK_CMD=$(echo "${{ github.event.inputs.command }}" \
+            | sed -z -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/\n/\\n/g' -e 's/\r/\\r/g' -e 's/\t/\\t/g' -e 's/\x08/\\b/g' -e 's/\x0c/\\f/')
+          echo "CMD: $TASK_CMD"
+          TASK_ARN=$(aws ecs run-task \
+            --cluster ${{ env.AWS_ECS_CLUSTER }} \
+            --launch-type FARGATE \
+            --task-definition ${{ env.LATEST_TASK_DEF }} \
+            --network-configuration 'awsvpcConfiguration={subnets=["subnet-09ca2883e479b74dd", "subnet-00cdd25fc7a991867"],securityGroups=["sg-04d892c8cc26c7158"],assignPublicIp="DISABLED"}' \
+            --tags key=StartedBy,value=GitHubActions \
+            --count 1 \
+            --overrides '{"containerOverrides": [{"name": "${{ env.CONTAINER_NAME }}","command": ["'"$TASK_CMD"'"] }]}' \
+            --query tasks[0].taskArn --output text)
+          echo "TASK_ARN: $TASK_ARN"
+          echo "TASK_ARN=$TASK_ARN" >> $GITHUB_OUTPUT
+
+      # タスク起動を待機
+      - name: Wait ECS Task Start
+        id: wait-ecs-task-start
+        env:
+          TASK_ARN: ${{ steps.run-ecs-task.outputs.TASK_ARN }}
+        run: |
+          echo "* ECSタスク起動中"
+          set +e
+          while true; do
+            TASK_STATUS=$(aws ecs describe-tasks --cluster "${{ env.AWS_ECS_CLUSTER }}" --tasks "$TASK_ARN" | jq -r '.tasks[0].containers[] | select(.name=="${{ env.CONTAINER_NAME }}") | .lastStatus')
+            if [ "$TASK_STATUS" = "PENDING" -o "$TASK_STATUS" = "PROVISIONING" ]; then
+              sleep 2
+              continue
+            fi
+            break
+          done
+
+      # タスク出力を表示.
+      - name: Show ECS Task Log
+        id: show-ecs-task-log
+        env:
+          TASK_ARN: ${{ steps.run-ecs-task.outputs.TASK_ARN }}
+        run: |
+          TASK_LOG_STREAM="${{ env.TASK_LOG_PREFIX }}/${{ env.CONTAINER_NAME }}/"$(echo "$TASK_ARN" | sed -e "s|.*/||g")
+          echo "* Task log stream: $TASK_LOG_STREAM"
+          echo ""
+          echo "*** タスク実行中 - "$(date +'%Y-%m-%d %H:%M:%S')
+          sleep 10
+          TASK_NEXT_TOKEN=""
+          while true; do
+            # ログ出力する
+            set +e
+            if [ "$TASK_NEXT_TOKEN" = "" -o "$TASK_NEXT_TOKEN" = "null" ]; then
+              TASK_LOG=$(aws logs get-log-events --log-group-name "${{ env.TASK_LOG_GROUP }}" --log-stream-name "$TASK_LOG_STREAM" --start-from-head --limit 10000)
+            else
+              TASK_LOG=$(aws logs get-log-events --log-group-name "${{ env.TASK_LOG_GROUP }}" --log-stream-name "$TASK_LOG_STREAM" --no-start-from-head --next-token $TASK_NEXT_TOKEN --limit 10000)
+            fi
+            TASK_NEXT_TOKEN=$(echo "$TASK_LOG" | jq -r '.nextForwardToken')
+            echo "$TASK_LOG" | jq -r '.events[].message'
+            set -e
+            
+            # タスクのステータスを確認
+            TASK_STATUS=$(aws ecs describe-tasks --cluster "${{ env.AWS_ECS_CLUSTER }}" --tasks "$TASK_ARN" | jq -r '.tasks[0].containers[] | select(.name=="${{ env.CONTAINER_NAME }}") | .lastStatus')
+            if [ ! "$TASK_STATUS" = "RUNNING" ]; then
+              # 実行中でなければ、終了
+              echo "タスクの終了を検知"
+              break
+            fi
+            
+            # 次のログ出力まで待機
+            echo "タスク実行中"
+            sleep 2
+          done

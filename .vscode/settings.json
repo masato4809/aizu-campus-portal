@@ -1,0 +1,21 @@
+{
+    "java.test.config": {
+        "testFramework": "junit",
+        "testRunner": "junit5"
+    },
+    "phpunit.path": "tools/phpunit",
+    "phpunit.configuration": "wportal2-app/phpunit.xml",
+
+    // PHPUnit Test Explorer (recca0120.vscode-phpunit) settings for Docker Compose
+    "phpunit.command": "${phpunit} ${phpunitargs}",
+    "phpunit.phpunit": "tools/phpunit",
+    "phpunit.args": [
+        "-c",
+        "wportal2-app/phpunit.xml"
+    ],
+    "chat.tools.terminal.autoApprove": {
+        "docker compose": true,
+        "tools/phpunit": true,
+        "printf": true
+    }
+}

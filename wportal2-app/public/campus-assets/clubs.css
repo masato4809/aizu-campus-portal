@@ -1,0 +1,87 @@
+.club-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.club-heading p { font-size: 14px; line-height: 1.9; }
+.club-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid #d9e3dc;
+    margin: 0 0 20px;
+}
+.club-tabs a {
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+    margin: 0;
+    padding: 16px 12px;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 3px solid transparent;
+    font-size: 14px;
+    white-space: normal;
+}
+.club-tabs a[aria-current="page"] {
+    color: #1d6450;
+    background: #eaf3ee;
+    border-bottom-color: #267d65;
+    font-weight: 700;
+}
+.club-ranking-note { line-height: 1.9; margin-bottom: 24px; }
+.club-card-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.club-rank { color: #247c66; font-weight: 700; }
+
+.club-rank--gold {
+    color: #8a6d1f;
+    background: linear-gradient(135deg, #fff3cf, #f0d271);
+    padding: 3px 10px;
+    border-radius: 999px;
+}
+
+.club-rank--silver {
+    color: #5b6268;
+    background: linear-gradient(135deg, #f4f6f8, #d6dbe0);
+    padding: 3px 10px;
+    border-radius: 999px;
+}
+
+.club-rank--bronze {
+    color: #7a4526;
+    background: linear-gradient(135deg, #f0d3b8, #d9a066);
+    padding: 3px 10px;
+    border-radius: 999px;
+}
+.club-card h2 { overflow-wrap: anywhere; }
+.club-cover { margin: 14px 0; }
+.club-cover img { display: block; width: 100%; max-height: 240px; object-fit: cover; border-radius: 10px; }
+.club-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
+.club-meta .pill { font-size: 11px; }
+.club-score { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; margin: 18px 0; }
+.club-score strong { font-size: 36px; line-height: 1.2; color: #1d6450; }
+.club-score strong small { font-size: 16px; margin-left: 6px; }
+.club-score > span { font-size: 12px; line-height: 1.8; }
+.club-type-row { display: grid; grid-template-columns: 44px minmax(30px, 1fr) 96px; gap: 10px; align-items: center; margin: 12px 0; font-size: 12px; }
+.club-type-row meter { width: 100%; accent-color: #267d65; }
+.club-type-row > span:last-child { text-align: right; }
+.club-post { border-top: 1px solid #edf0ee; padding-top: 8px; }
+.club-gallery, .club-image-preview { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 16px 0; }
+.club-gallery img, .club-image-preview img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; }
+.club-image-preview { max-width: 560px; }
+.club-image-preview figure { margin: 0; min-width: 0; }
+.club-image-preview figcaption { font-size: 12px; margin-top: 6px; overflow-wrap: anywhere; }
+.club-image-clear { margin: 0 20px 20px 0; }
+.club-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.club-links .button { white-space: normal; }
+.club-delete { margin: 16px 0 0; }
+.club-delete summary { font-size: 12px; color: #98432e; }
+.club-edit { margin-top: 18px; border-top: 1px solid #edf0ee; padding-top: 12px; }
+.club-edit form { display: grid; gap: 12px; margin-top: 12px; }
+.club-edit summary { color: #1d6450; font-size: 12px; font-weight: 700; }
+#club-post-form { scroll-margin-top: 20px; }
+@media (max-width: 650px) {
+    .club-tabs { gap: 0; overflow: visible; }
+    .club-tabs a { font-size: 12px; padding: 14px 8px; }
+}

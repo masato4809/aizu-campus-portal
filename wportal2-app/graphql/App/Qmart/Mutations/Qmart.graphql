@@ -1,0 +1,48 @@
+# Qマート: 出品登録.
+mutation AppQmartItemCreate(
+  $title: String!
+  $description: String!
+  $price: Int!
+  $images: [Upload!]
+) {
+  AppQmartItemCreate(
+    title: $title
+    description: $description
+    price: $price
+    images: $images
+  ) {
+    statusCode
+    statusMessage
+    errors
+  }
+}
+
+# Qマート: ステータス更新.
+mutation AppQmartItemUpdateStatus(
+  $id: Int!
+  $status: Int!
+) {
+  AppQmartItemUpdateStatus(
+    id: $id
+    status: $status
+  ) {
+    statusCode
+    statusMessage
+    errors
+  }
+}
+
+# Qマート: コメント投稿.
+mutation AppQmartCommentCreate(
+  $qmartItemId: Int!
+  $comment: String!
+) {
+  AppQmartCommentCreate(
+    qmartItemId: $qmartItemId
+    comment: $comment
+  ) {
+    statusCode
+    statusMessage
+    errors
+  }
+}

@@ -1,0 +1,12 @@
+# Redisに値を格納.
+mutation SampleRedisUpdate(
+  $storeValue: String
+) {
+  SampleRedisUpdate(
+    storeValue: $storeValue
+  ) {
+    statusCode
+    statusMessage
+    errors
+  }
+}

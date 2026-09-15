@@ -1,0 +1,137 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Docker: Up (wportal2_web)",
+            "type": "shell",
+            "command": "docker",
+            "args": [
+                "compose",
+                "up",
+                "-d",
+                "wportal2_web"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Tests",
+            "type": "shell",
+            "dependsOn": [
+                "Docker: Up (wportal2_web)"
+            ],
+            "dependsOrder": "sequence",
+            "command": "docker",
+            "args": [
+                "compose",
+                "exec",
+                "-T",
+                "-w",
+                "/var/www/html/wportal2-app",
+                "wportal2_web",
+                "./vendor/bin/phpunit",
+                "-c",
+                "phpunit.xml",
+                "--testsuite",
+                "Unit"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                {
+                    "owner": "phpunit",
+                    "pattern": [
+                        {
+                            "regexp": "^(.*):(\\d+): (.*)$",
+                            "file": 1,
+                            "line": 2,
+                            "message": 3
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "Run Test (Current File)",
+            "type": "shell",
+            "dependsOn": [
+                "Docker: Up (wportal2_web)"
+            ],
+            "dependsOrder": "sequence",
+            "command": "docker",
+            "args": [
+                "compose",
+                "exec",
+                "-T",
+                "-w",
+                "/var/www/html/wportal2-app",
+                "wportal2_web",
+                "./vendor/bin/phpunit",
+                "-c",
+                "phpunit.xml",
+                "${relativeFile}"
+            ],
+            "group": "test",
+            "problemMatcher": [
+                {
+                    "owner": "phpunit",
+                    "pattern": [
+                        {
+                            "regexp": "^(.*):(\\d+): (.*)$",
+                            "file": 1,
+                            "line": 2,
+                            "message": 3
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "Run Test (Filter Prompt)",
+            "type": "shell",
+            "dependsOn": [
+                "Docker: Up (wportal2_web)"
+            ],
+            "dependsOrder": "sequence",
+            "command": "docker",
+            "args": [
+                "compose",
+                "exec",
+                "-T",
+                "-w",
+                "/var/www/html/wportal2-app",
+                "wportal2_web",
+                "./vendor/bin/phpunit",
+                "-c",
+                "phpunit.xml",
+                "--testsuite",
+                "Unit",
+                "--filter",
+                "${input:phpunitFilter}"
+            ],
+            "group": "test",
+            "problemMatcher": [
+                {
+                    "owner": "phpunit",
+                    "pattern": [
+                        {
+                            "regexp": "^(.*):(\\d+): (.*)$",
+                            "file": 1,
+                            "line": 2,
+                            "message": 3
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "inputs": [
+        {
+            "id": "phpunitFilter",
+            "type": "promptString",
+            "description": "PHPUnit --filter (例: ShiftScheduleQueryServiceTest)",
+            "default": ""
+        }
+    ]
+}

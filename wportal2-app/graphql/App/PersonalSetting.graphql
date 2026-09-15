@@ -1,0 +1,30 @@
+# App/PersonalSetting.graphql
+extend type Mutation @guard {
+  # Slack連携の実施.
+  AppPersonalSettingShowAlignSlack
+    : Response @field(
+    resolver: "App\\GraphQL\\App\\Mutations\\AppPersonalSettingShowAlignSlack"
+  )
+
+  # SPログイン用パスワードの送付.
+  AppPersonalSettingSpPassword(
+    password: String!
+  ) : AppPersonalSettingSpPasswordResponse @field(
+    resolver: "App\\GraphQL\\App\\Mutations\\AppPersonalSettingSpPassword"
+  )
+
+  # 二要素認証コードの確認.
+  AppPersonalSettingSpConfirmCode(
+    code: String!
+  ) : Response @field(
+    resolver: "App\\GraphQL\\App\\Mutations\\AppPersonalSettingSpConfirmCode"
+  )
+}
+
+# SPログイン用パスワードの送付.
+type AppPersonalSettingSpPasswordResponse {
+  statusCode: Int!
+  statusMessage: String!
+  errors: String
+  url: String!
+}

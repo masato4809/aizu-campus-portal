@@ -1,0 +1,19 @@
+# Sample/Redis.graphql
+
+extend type Query {
+  # Redisから値を取得.
+  SampleRedis(
+    sampleArgument: String!
+  ): SampleRedis! @field(resolver: "App\\GraphQL\\Sample\\Queries\\SampleRedisQuery")
+}
+
+extend type Mutation {
+  # Redisへ保存する値の更新.
+  SampleRedisUpdate(
+    storeValue: String
+  ): Response @field(resolver: "App\\GraphQL\\Sample\\Mutations\\SampleRedisUpdate")
+}
+
+type SampleRedis {
+  storeValue: String!
+}

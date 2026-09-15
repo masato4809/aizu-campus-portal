@@ -1,0 +1,18 @@
+# ページネーション取得サンプル.
+query SamplePagination(
+  $pageIndex: Int!
+  $pageStep: Int!
+) {
+  SamplePagination(
+    pageIndex: $pageIndex
+    pageStep: $pageStep
+  ) {
+    list {
+      id
+      authId
+      nickname
+      faceImagePath
+    }
+    count
+  }
+}

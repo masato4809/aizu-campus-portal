@@ -1,0 +1,10 @@
+# Redisに格納した値を取得.
+query SampleRedis(
+  $sampleArgument: String!
+) {
+  SampleRedis (
+    sampleArgument: $sampleArgument
+  ) {
+    storeValue
+  }
+}

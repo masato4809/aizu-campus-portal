@@ -1,0 +1,58 @@
+.avatar {
+    height:50px;
+    width:50px;
+    display:grid;
+    place-items:center;
+    background:#e4eee6;
+    color:#57816a;
+    border-radius:50%;
+    font-size:20px
+}
+
+.match-score {
+    display:inline-flex;
+    align-items:baseline;
+    gap:2px;
+    padding:6px 14px;
+    border-radius:var(--radius-pill, 999px);
+    color:#fff;
+    font-size:22px;
+    font-weight:750;
+    background:#257b61
+}
+
+.match-score.tier-high { background:var(--color-accent-3) }
+.match-score.tier-mid { background:#257b61 }
+.match-score.tier-low { background:var(--color-accent-2) }
+
+.match-score small {
+    font-size:12px;
+    opacity:.85
+}
+
+.tags {
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin:20px 0
+}
+
+.pill.past-exams-available {
+    background:#17644b;
+    color:#fff;
+    border:2px solid #17644b;
+    font-weight:700;
+}
+
+.pill.past-exams-unavailable {
+    background:#f2f4f3;
+    color:#52605a;
+    border:2px solid #d8dfdb;
+}
+
+.senior-profile-facts { margin:16px 0; }
+.senior-profile-facts > div { padding:10px 0; border-bottom:1px solid #dfe7e5; }
+.senior-profile-facts dt { font-size:12px; color:#536761; }
+.senior-profile-facts dd { margin:6px 0 0; font-weight:700; overflow-wrap:anywhere; }
+.senior-past-exams { padding:16px; margin:16px 0; background:#f0f7f3; border-radius:12px; }
+.senior-past-exams h3 { margin-top:0; }

@@ -1,0 +1,20 @@
+# 予定一覧の取得.
+query UsecasesCalendarUserScheduleList(
+  $emailList: [String!]!
+  $startDate: String!
+  $endDate: String!
+) {
+  UsecasesCalendarUserScheduleList(
+    emailList: $emailList
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    identify,
+    eventId
+    calendarId,
+    kind,
+    summary,
+    start,
+    end,
+  }
+}

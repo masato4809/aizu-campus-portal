@@ -1,0 +1,14 @@
+# Sample/Pagination.graphql
+
+extend type Query {
+  # ページネーション情報の取得.
+  SamplePagination(
+    pageIndex: Int!
+    pageStep: Int!
+  ): SamplePagination! @field(resolver: "App\\GraphQL\\Sample\\Queries\\SamplePaginationQuery")
+}
+
+type SamplePagination {
+  list: [AppTrnUser]!
+  count: Int!
+}

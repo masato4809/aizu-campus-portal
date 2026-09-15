@@ -1,0 +1,77 @@
+# Qマート: 出品アイテム一覧の取得.
+query AppQmartItemList(
+  $index: Int!
+  $step: Int!
+) {
+  AppQmartItemList(
+    index: $index
+    step: $step
+  ) {
+    list {
+      id,
+      userId,
+      title,
+      description,
+      price,
+      status,
+      createdAt,
+      updatedAt,
+      trnUser {
+        id,
+        authId,
+        nickname,
+        faceImagePath,
+      },
+      trnQmartItemImage {
+        id,
+        qmartItemId,
+        filePath,
+        sortOrder,
+      },
+    },
+    count,
+  }
+}
+
+# Qマート: 出品アイテム詳細の取得.
+query AppQmartItemDetail(
+  $id: Int!
+) {
+  AppQmartItemDetail(
+    id: $id
+  ) {
+    id,
+    userId,
+    title,
+    description,
+    price,
+    status,
+    createdAt,
+    updatedAt,
+    trnUser {
+      id,
+      authId,
+      nickname,
+      faceImagePath,
+    },
+    trnQmartItemImage {
+      id,
+      qmartItemId,
+      filePath,
+      sortOrder,
+    },
+    trnQmartComment {
+      id,
+      qmartItemId,
+      userId,
+      comment,
+      createdAt,
+      trnUser {
+        id,
+        authId,
+        nickname,
+        faceImagePath,
+      },
+    },
+  }
+}

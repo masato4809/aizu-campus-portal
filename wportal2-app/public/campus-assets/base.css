@@ -1,0 +1,184 @@
+:root {
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+    color:#243b35;
+    background:#f6f8f7;
+    font-synthesis:none
+}
+
+* {
+    box-sizing:border-box
+}
+
+body {
+    margin:0
+}
+
+a {
+    color:#247c66;
+    text-decoration:none
+}
+
+a:hover {
+    text-decoration:underline
+}
+
+button,input,select,textarea {
+    font:inherit
+}
+
+button,a,input,select,textarea {
+    outline-offset:4px
+}
+
+.eyebrow {
+    font-size:10px;
+    letter-spacing:2px;
+    font-weight:700;
+    color:#6d9084;
+    margin:23px 0
+}
+
+.text-button {
+    background:none;
+    border:0;
+    padding:0;
+    color:#76847e;
+    cursor:pointer
+}
+
+.pill {
+    display:inline-block;
+    background:#edf4ef;
+    border:1px solid #e1ece5;
+    padding:6px 10px;
+    border-radius:6px;
+    font-size:10px;
+    color:#42745e;
+    font-weight:600
+}
+
+.pill--club {
+    background:var(--color-accent-2);
+    border-color:var(--color-accent-2);
+    color:#fff
+}
+
+.button {
+    display:inline-block;
+    padding:12px 20px;
+    border:1px solid #257b61;
+    border-radius:8px;
+    background:#267d65;
+    color:#fff;
+    font-size:13px;
+    cursor:pointer;
+    white-space:nowrap;
+    font-weight:600
+}
+
+.button:hover {
+    background:#1d6450;
+    text-decoration:none
+}
+
+.secondary {
+    background:#fff;
+    color:#267d65
+}
+
+.secondary:hover {
+    background:#e9f3ed
+}
+
+.section-heading h2 {
+    font-size:18px
+}
+
+.section-heading {
+    margin-bottom:18px
+}
+
+.small {
+    font-size:12px
+}
+
+.card {
+    background:white;
+    border:1px solid #e1e8e4;
+    border-radius:14px;
+    padding:26px;
+    margin-bottom:24px;
+    box-shadow:0 3px 10px #173d2403;
+    min-width:0
+}
+
+.card h2 {
+    font-size:20px;
+    line-height:1.5;
+    margin:12px 0
+}
+
+.card p {
+    line-height:1.9;
+    font-size:14px
+}
+
+.preserve {
+    white-space:pre-wrap;
+    overflow-wrap:anywhere
+}
+
+label {
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    line-height:1.6;
+    margin-bottom:17px
+}
+
+input,select,textarea {
+    display:block;
+    width:100%;
+    border:1px solid #d9e3dc;
+    border-radius:7px;
+    padding:12px;
+    background:#fff;
+    color:#294237;
+    margin-top:7px
+}
+
+textarea {
+    min-height:110px;
+    resize:vertical
+}
+
+.form-grid {
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px
+}
+
+.notice,.error {
+    padding:17px 22px;
+    margin:20px 0;
+    background:#e9f4ec;
+    border-radius:8px;
+    font-size:13px;
+    line-height:1.8
+}
+
+.error {
+    background:#fff0ec;
+    color:#98432e
+}
+
+.empty {
+    padding:44px 25px;
+    border:1px dashed #cbdacf;
+    border-radius:12px;
+    color:#7b8980;
+    line-height:2;
+    grid-column:1/-1;
+    margin-bottom:24px;
+    font-size:14px
+}

@@ -1,0 +1,13 @@
+# Sample/InputForm.graphql
+
+extend type Mutation {
+  # 入力値の受取.
+  SampleInputFormUpdate(
+    inputSingleNumber: String
+    inputSingleNotZero: String
+    inputSingleRange: String
+    inputSingleEmail: String
+    inputMulti: String
+    inputSelectStringId: Int
+  ): Response @field(resolver: "App\\GraphQL\\Sample\\Mutations\\SampleInputFormUpdate")
+}

@@ -1,0 +1,114 @@
+###########################
+# wportal2
+# Vite+SSRで作成するプロジェクトのサンプル
+# ローカル開発環境
+
+services:
+  ###########################
+  # wportal2_web : php + Apache + Composer + npm
+  # webサーバー
+  wportal2_web:
+    container_name: wportal2_web
+    build: wportal2-app/docker/web
+    environment:
+      - APP_TIMEOUT=60
+      - PHP_MEMORY_LIMIT=256M
+      - PHP_MAX_UPLOAD=20M
+      - XDEBUG_MODE=debug # リモートデバッグでステップ実行をする場合は値をdebugに変更する
+    working_dir: /var/www/html/wportal2-app
+    ports:
+      - "9190:80"   # Laravel用
+      - "5173:5173" # Vite用
+    networks:
+      - wportal2_local
+    volumes:
+      - ./:/var/www/html
+
+  ###########################
+  # wportal2_db : mysql 8.0
+  # DBサーバー
+  wportal2_db:
+    image: mysql:8.0
+    container_name: 'wportal2_db'
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: wportal2
+      MYSQL_USER: wportal2
+      MYSQL_PASSWORD: wportal2
+      MYSQL_ROOT_PASSWORD: wportal2
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - wportal2_db_volume:/var/lib/mysql
+      - ./wportal2-app/docker/db/conf.d:/etc/mysql/conf.d
+    networks:
+      - wportal2_local
+
+  ###########################
+  # wportal2_db_test : mysql 8.0
+  # DBサーバー(テスト用)
+  wportal2_db_test:
+    image: mysql:8.0
+    container_name: 'wportal2_db_test'
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_DATABASE: wportal2_test
+      MYSQL_USER: wportal2_test
+      MYSQL_PASSWORD: wportal2_test
+      MYSQL_ROOT_PASSWORD: wportal2_test
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - wportal2_db_test_volume:/var/lib/mysql
+      - ./wportal2-app/docker/db/conf.d:/etc/mysql/conf.d
+    networks:
+      - wportal2_local
+
+  ###########################
+  # wportal2_redis : Redis 7.2 cache server
+  # Redisサーバー
+  wportal2_redis:
+    container_name: wportal2_redis
+    image: redis:7.2
+    ports:
+      - "6379:6379"
+    networks:
+      - wportal2_local
+    volumes:
+      - wportal2_redis_volume:/data
+
+  ###########################
+  # minio
+  wportal2-minio:
+    container_name: wportal2-minio
+    image: minio/minio:RELEASE.2024-04-28T17-53-50Z
+    environment:
+      MINIO_ACCESS_KEY: wportal2-minio
+      MINIO_SECRET_KEY: wportal2-minio
+    ports:
+      - 19000:19000
+      - 19001:19001
+    networks:
+      - wportal2_local
+    volumes:
+      - ./wportal2-app/local-s3:/wportal2/minio/data
+    command: server --address ":19000" --console-address ":19001" /wportal2/minio/data
+
+networks:
+  wportal2_local:
+    name: wportal2_local
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.245.0/24 # 他と衝突しなければなんでも良い認識
+
+volumes:
+  wportal2_db_volume:
+    driver: local
+  wportal2_db_test_volume:
+    driver: local
+  wportal2_redis_volume:
+    driver: local

@@ -1,0 +1,129 @@
+name: wportal2-deploy
+
+on:
+  push:
+    branches:
+      - release
+
+permissions:  
+  id-token: write
+  contents: read
+
+env:
+  ECR_REGISTRY: 979109089196.dkr.ecr.ap-northeast-1.amazonaws.com
+  ECR_REPOSITORY: wportal2_ecr_repository
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: configure aws credential
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::979109089196:role/wportal2_deploy_iam_role
+          aws-region: ap-northeast-1
+
+      # Source step
+      - name: Source step - gitからコード取得
+        uses: actions/checkout@v2
+      - name: Source step - List files
+        run: |
+          ls -l      
+
+      # ビルド設定.
+      - name: Build step - setup buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+
+      # キャッシュ対応.
+      - name: Cache step
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      # ECRログイン.
+      - name: Build step - login to ECR
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.ECR_REGISTRY }}
+
+      # envの準備.
+      - name: Build step - prepare .env
+        run: |
+          cp wportal2-app/.env.prd.sample wportal2-app/.env
+          echo APP_KEY="$(aws ssm get-parameter --name /wportal/app_key --with-decryption --query Parameter.Value --output text)" >> wportal2-app/.env
+          echo DB_HOST="$(aws ssm get-parameter --name /wportal/db/host --query Parameter.Value --output text)" >> wportal2-app/.env
+          echo DB_USERNAME="$(aws ssm get-parameter --name /wportal/db/username --query Parameter.Value --output text)" >> wportal2-app/.env
+          echo DB_PASSWORD="$(aws ssm get-parameter --name /wportal/db/password --query Parameter.Value --output text)" >> wportal2-app/.env
+          echo REDIS_HOST="$(aws ssm get-parameter --name /wportal/redis/host --query Parameter.Value --output text)" >> wportal2-app/.env
+          echo GOOGLE_CLIENT_ID="$(aws ssm get-parameter --name /wportal/google_client_id --query Parameter.Value --output text)" >> wportal2-app/.env
+          echo GOOGLE_CLIENT_SECRET="$(aws ssm get-parameter --name /wportal/google_client_secret --query Parameter.Value --output text)" >> wportal2-app/.env
+          echo GOOGLE_CALENDAR_SA="$(aws ssm get-parameter --name /wportal/google_calendar_sa --query Parameter.Value --output text)" >> wportal2-app/.env
+          echo SLACK_APP_TOKEN="$(aws ssm get-parameter --name /wportal/slack_app_token --query Parameter.Value --output text)" >> wportal2-app/.env
+          echo SLACK_BOT_USER_OAUTH_TOKEN="$(aws ssm get-parameter --name /wportal/slack_bot_user_oauth_token --query Parameter.Value --output text)" >> wportal2-app/.env
+          echo SLACK_URL_NOTICE="$(aws ssm get-parameter --name /wportal/slack_url_notice --query Parameter.Value --output text)" >> wportal2-app/.env
+          echo RECAPTCHA_SECRET_KEY="$(aws ssm get-parameter --name /wportal/recaptcha_secret_key --query Parameter.Value --output text)" >> wportal2-app/.env
+          echo VITE_RECAPTCHA_SITE_KEY="$(aws ssm get-parameter --name /wportal/vite_recaptcha_site_key --with-decryption --query Parameter.Value --output text)" >> wportal2-app/.env
+          echo APP_AWS_ACCESS_KEY_ID="$(aws ssm get-parameter --name /wportal/app_aws_access_key_id --query Parameter.Value --output text)" >> wportal2-app/.env
+          echo APP_AWS_SECRET_ACCESS_KEY="$(aws ssm get-parameter --name /wportal/app_aws_secret_access_key --query Parameter.Value --output text)" >> wportal2-app/.env
+          echo APP_AWS_REGION="$(aws ssm get-parameter --name /wportal/app_aws_region --query Parameter.Value --output text)" >> wportal2-app/.env
+
+      # Buildxでイメージをビルドする
+      - name: Build images - App
+        uses: docker/build-push-action@v4
+        with:
+          push: false
+          builder: ${{ steps.buildx.outputs.name }} # Buildxでビルドすることを指定
+          tags: 979109089196.dkr.ecr.ap-northeast-1.amazonaws.com/wportal2_ecr_service_container:latest # イメージ名を指定/docker-compose.ymlで参照する名前
+          load: true
+          context: .
+          file: ./DockerfileForServiceContainer
+          cache-from: type=local,src=/tmp/.buildx-cache # キャッシュを指定
+          cache-to: type=local,dest=/tmp/.buildx-cache-new # キャッシュを指定
+
+      # docker-compose(with cache)でビルド.
+      - name: Build step - docker-compose build
+        run: |
+          docker compose -f docker-compose-for-service.yml build
+          docker compose -f docker-compose-for-service.yml up -d
+          docker compose -f docker-compose-for-service.yml ps
+
+      # ECRへのpush.
+      - name: Build step - docker-compose push
+        run: |
+          echo "docker-composeでビルドしたイメージをECRにpush"
+          docker compose -f docker-compose-for-service.yml push
+
+      # タスク定義作成.
+      - name: Deploy step - render task
+        id: render-task
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: wportal2-container
+          image: 979109089196.dkr.ecr.ap-northeast-1.amazonaws.com/wportal2_ecr_service_container:latest
+
+      # タスク定義のデプロイ.
+      - name: Deploy step - deploy task
+        id: deploy-task
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.render-task.outputs.task-definition }}
+          service: wportal2-ecs-service
+          cluster: wportal2-ecs-cluster
+          wait-for-service-stability: true
+
+      # Slack通知.
+      - name: slack notice
+        run: |
+          echo "Notice to slack"
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"web本部ポータルのdeployが完了しました:${{ github.sha }}"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      # キャッシュ削除.
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache

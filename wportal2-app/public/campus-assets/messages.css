@@ -1,0 +1,48 @@
+.message-layout {
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:24px
+}
+
+.contact {
+    display:flex;
+    justify-content:space-between;
+    padding:15px 10px;
+    border-radius:7px;
+    font-size:14px
+}
+
+.selected {
+    background:#e9f3ed
+}
+
+.messages {
+    max-height:440px;
+    overflow:auto;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    padding:20px 0
+}
+
+.bubble {
+    background:#f1f4f2;
+    max-width:85%;
+    border-radius:12px;
+    padding:10px 16px;
+    align-self:flex-start
+}
+
+.bubble.mine {
+    align-self:flex-end;
+    background:#e2f0e7
+}
+
+.bubble p {
+    margin:0 0 8px
+}
+
+.bubble small {
+    font-size:10px;
+    color:#7e9286
+}

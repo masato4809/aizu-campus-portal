@@ -1,0 +1,38 @@
+# npm run lefthook で実行可能
+
+pre-commit:
+  parallel: false
+  commands:
+    tsc:
+      glob: '*.{ts,tsx}'
+      run: npm run tsc --prefix ./wportal2-app
+    prettier:
+      glob: '*.{ts,tsx}'
+      run: |
+        ./wportal2-app/node_modules/.bin/prettier --write {staged_files}
+        git add {staged_files}
+    eslint:
+      glob: '*.{ts,tsx}'
+      run: |
+        ./wportal2-app/node_modules/.bin/eslint --fix {staged_files} -c ./wportal2-app/eslint.config.mjs
+    pint:
+      glob: '*.{php}'
+      run: |
+        ./wportal2-app/vendor/bin/pint {staged_files}
+        git add {staged_files}
+    phpstan:
+      glob: '*.{php}'
+      run: |
+        ./wportal2-app/vendor/bin/phpstan analyse -c ./wportal2-app/phpstan.neon {staged_files}
+    ide-helper:
+      glob: '*.{php}'
+      run: |
+        cd ./wportal2-app
+        php artisan ide-helper:generate
+        php artisan ide-helper:models -N
+    graphql:
+      glob: '*'
+      run: |
+        cd ./wportal2-app
+        php artisan lighthouse:ide-helper
+

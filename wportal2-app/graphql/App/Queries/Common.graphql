@@ -1,0 +1,25 @@
+# ユーザー一覧の取得.
+query AppTrnUserList {
+  AppTrnUserList {
+    id,
+    authId,
+    nickname,
+    faceImagePath,
+  }
+}
+
+# 部署一覧の取得.
+query AppTrnDivisionList {
+  AppTrnDivisionList {
+    id,
+    name,
+  }
+}
+
+# プロジェクト一覧の取得.
+query AppTrnProjectList {
+  AppTrnProjectList {
+    id,
+    name,
+  }
+}

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# VS Code の PHPUnit Test Explorer 用の互換ラッパーです。
+#
+# VS Code 側の実行時CWDが wportal2-app になった状態で `tools/phpunit` を相対パス実行しようとすると、
+# `wportal2-app/tools/phpunit` が参照されることがあります。
+# このファイルはその互換のためだけに存在し、リポジトリルートの本体（tools/phpunit）へ委譲します。
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+exec "$repo_root/tools/phpunit" "$@"

@@ -1,0 +1,84 @@
+# App/Qmart/Qmart.graphql
+extend type Query @guard {
+  # Qマート: 出品アイテム一覧の取得（オフセットページネーション）.
+  AppQmartItemList(
+    index: Int!
+    step: Int!
+  ): AppQmartItemListResponse! @field(
+    resolver: "App\\GraphQL\\App\\Qmart\\Queries\\AppQmartItemListQuery"
+  )
+
+  # Qマート: 出品アイテム詳細の取得.
+  AppQmartItemDetail(
+    id: Int!
+  ): AppQmartItem @field(
+    resolver: "App\\GraphQL\\App\\Qmart\\Queries\\AppQmartItemDetailQuery"
+  )
+}
+
+extend type Mutation @guard {
+  # Qマート: 出品登録.
+  AppQmartItemCreate(
+    title: String!
+    description: String!
+    price: Int!
+    images: [Upload!]
+  ): Response @field(
+    resolver: "App\\GraphQL\\App\\Qmart\\Mutations\\AppQmartItemCreate"
+  )
+
+  # Qマート: ステータス更新.
+  AppQmartItemUpdateStatus(
+    id: Int!
+    status: Int!
+  ): Response @field(
+    resolver: "App\\GraphQL\\App\\Qmart\\Mutations\\AppQmartItemUpdateStatus"
+  )
+
+  # Qマート: コメント投稿.
+  AppQmartCommentCreate(
+    qmartItemId: Int!
+    comment: String!
+  ): Response @field(
+    resolver: "App\\GraphQL\\App\\Qmart\\Mutations\\AppQmartCommentCreate"
+  )
+}
+
+# Qマート: 出品アイテム一覧レスポンス.
+type AppQmartItemListResponse {
+  list: [AppQmartItem!]!
+  count: Int!
+}
+
+# Qマート: 出品アイテム.
+type AppQmartItem {
+  id: Int!
+  userId: Int!
+  title: String!
+  description: String!
+  price: Int!
+  status: Int!
+  createdAt: String!
+  updatedAt: String!
+  trnUser: AppTrnUser
+  trnQmartItemImage: [AppQmartItemImage!]!
+  trnQmartComment: [AppQmartComment!]!
+}
+
+# Qマート: アイテム画像.
+type AppQmartItemImage {
+  id: Int!
+  qmartItemId: Int!
+  filePath: String!
+  sortOrder: Int!
+}
+
+# Qマート: コメント.
+type AppQmartComment {
+  id: Int!
+  qmartItemId: Int!
+  userId: Int!
+  comment: String!
+  createdAt: String!
+  trnUser: AppTrnUser
+}

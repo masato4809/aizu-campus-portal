@@ -1,0 +1,7 @@
+/**
+ * InertiaLinkを利用した際に意図せぬデザイン変更を受けないように.
+ */
+a {
+    color: unset;
+    text-decoration: none;
+}

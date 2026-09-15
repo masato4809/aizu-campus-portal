@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# devコンテナ内で PHPUnit を実行するためのラッパーです。
+#
+# このリポジトリには phpunit ラッパーが2つあります。
+# - tools/phpunit（本体）
+# - wportal2-app/tools/phpunit（委譲だけを行う薄いラッパー）
+#
+# 理由:
+# VS Code の PHPUnit Test Explorer（recca0120.vscode-phpunit）は、実行時の作業ディレクトリ（CWD）が
+# wportal2-app になることがあり、その状態で `tools/phpunit` を相対パスで実行しようとすると
+# `wportal2-app/tools/phpunit` を探してしまい ENOENT になることがあります。
+# それを吸収するために、wportal2-app 側にも「本体へ委譲するだけ」のラッパーを置いています。
+#
+# Usage examples:
+#   tools/phpunit --testsuite Unit
+#   tools/phpunit --filter ShiftScheduleQueryServiceTest
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+container_root="/var/www/html"
+cd "$repo_root"
+
+mapped_args=()
+for arg in "$@"; do
+	# オプション=値 形式で wportal2-app/ プレフィックスが付く場合もある
+	# 例: --configuration=wportal2-app/phpunit.xml
+	if [[ "$arg" == *=wportal2-app/* ]]; then
+		arg="${arg/=wportal2-app\//=}"
+	fi
+
+	# VS Code/拡張から wportal2-app/ 付きの相対パスが渡ることがある。
+	# コンテナ側のCWDは /var/www/html/wportal2-app なので prefix を剥がす。
+	if [[ "$arg" == wportal2-app/* ]]; then
+		arg="${arg#wportal2-app/}"
+	fi
+
+	if [[ "$arg" == "$repo_root"* ]]; then
+		mapped_args+=("${arg/#$repo_root/$container_root}")
+	elif [[ "$arg" == *="$repo_root"* ]]; then
+		# 例: --configuration=/Users/.../wportal2/wportal2-app/phpunit.xml
+		left="${arg%%=*}"
+		right="${arg#*=}"
+		mapped_args+=("${left}=${right/#$repo_root/$container_root}")
+	else
+		mapped_args+=("$arg")
+	fi
+done
+
+exec docker compose exec -T -w /var/www/html/wportal2-app wportal2_web ./vendor/bin/phpunit "${mapped_args[@]}"

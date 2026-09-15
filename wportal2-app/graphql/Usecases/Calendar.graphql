@@ -1,0 +1,19 @@
+# App/Calendar.graphql
+extend type Query @guard {
+  # 予定一覧の取得.
+  UsecasesCalendarUserScheduleList(
+    emailList: [String!]!
+    startDate: String!
+    endDate: String!
+  ): [UsecasesCalendarUserSchedule]! @field(resolver: "App\\GraphQL\\Usecases\\Queries\\UsecasesCalendarUserScheduleListQuery")
+}
+
+type UsecasesCalendarUserSchedule {
+  identify: String!
+  eventId: String!
+  calendarId: String!
+  kind: String!
+  summary: String!
+  start: String!
+  end: String!
+}

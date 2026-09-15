@@ -1,0 +1,40 @@
+.quiz-question {
+    margin-top:22px
+}
+
+.quiz-question > p {
+    font-weight:600;
+    margin-bottom:10px
+}
+
+.quiz-options {
+    display:flex;
+    gap:14px
+}
+
+.quiz-options label {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex:1;
+    margin-bottom:0;
+    font-weight:400;
+    background:#f6f8f7;
+    border:1px solid #e1e8e4;
+    border-radius:8px;
+    padding:12px 14px;
+    cursor:pointer
+}
+
+.quiz-options input[type="radio"] {
+    display:inline-block;
+    width:auto;
+    margin:0;
+    flex-shrink:0
+}
+
+@media (max-width:640px) {
+    .quiz-options {
+        flex-direction:column
+    }
+}

@@ -1,0 +1,33 @@
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+/local-s3/*
+wportal2-app/.env
+.env.backup
+.phpunit.result.cache
+.php-cs-fixer.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/.idea
+/.vscode/*
+!/.vscode/tasks.json
+!/.vscode/settings.json
+!/.vscode/extensions.json
+!/.vscode/launch.json
+local-opensearch
+.pint.cache
+
+#  Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# .tfvars files
+*.tfvars

@@ -1,0 +1,4 @@
+# SourceTree上でcommitする場合に下記が必要.
+PATH="/usr/local/bin:$PATH"
+
+docker exec -i wportal2_web bash -c "npm run lefthook"
